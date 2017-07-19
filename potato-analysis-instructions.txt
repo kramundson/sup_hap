@@ -1,0 +1,81 @@
+# 18 July 2017
+# Buell lab potato sequencing data analysis
+
+# Read the entire document before starting. When you're ready to start, boot up an
+m4.xlarge instance on AWS. 
+
+# Review Questions before you start:
+# 1. What is an aneuploid?
+# 2. Describe a potato haploid induction cross? What gets crossed as the female/male?
+# 3. Give a very general description of what bwa does
+
+# Goal: analyze a subset of the haploid sequencing data from Buell lab, Michigan State Univ.
+
+# Background:
+
+# 98 dihaploids were produced by crossing tetraploid potato (S. tuberosum) cultivar Superior
+# as the pollen acceptor to haploid inducer IVP-101
+
+# Previous analysis of potato haploid induction suggest that aneuploids occasionally appear
+# in the progeny. We want to know:
+
+# Q1. How often do aneuploids appear?
+# Q2. When we do see aneuploids, which parent contributes to aneuploid karyotype?
+
+Your job is to retrieve the whole-genome sequencing data of five putative haploid/aneuploid
+individuals, and, using depth of coverage to the reference genome, determine if any of the
+five are aneuploid.
+
+Of course, document the actual commands you used throughout the entire process.
+
+summary:
+1. Retrieve sequencing data of five Superior haploids from NCBI and potato reference genome
+2. Sequencing quality assessment, and, if necessary, quality trimming and filtering
+3. Mapping reads to reference (we've done this already)
+4. Assessing karyotype based on sequencing read coverage
+
+#1. Getting the data from NCBI
+
+Before we get the actual data, grab a table of sequencing run metadata from the following URL:
+https://www.ncbi.nlm.nih.gov/Traces/study/?WebEnv=NCID_1_75596124_130.14.22.76_5555_1500392762_2768540195_0MetA0_S_HStore&query_key=6
+
+Click Download RunInfo table and save the file with the following name:
+
+BioProject-PRJNA335821_SraRunTable.txt
+
+Next, use aspera and sratoolkit to prefetch the summary of the data files. See if you can
+use a combination of Unix tools to parse out the necessary information from
+BioProject-PRJNA335821_SraRunTable.txt and feed into the prefetch command. Vince's chapter
+on the remedial Unix shell should be helpful. Hint: A pipeline of cut, grep, xargs, and
+prefetch will do the trick.
+
+Download the potato reference genome using this command:
+wget http://solanaceae.plantbiology.msu.edu/data/potato_dm_v404_all_pm_un.fasta.zip
+Unzip this file and do a bwa index on the reference as done in the IGG 201B labs.
+
+#2. Inspect sequencing quality with fastqc. Remember this from the GGG 201B homework/labs?
+
+#3. Decide whether or not to trim the reads (it is up to you). Then, align the reads to the
+reference genome using bwa. We'll use a script called bwa-doall that does the alignment
+and a few other tasks in samtools for us. On your own, figure out what these tasks are.
+
+To see what bwa-doall needs from the user, type in
+
+<path-to-bwa-doall.py>/bwa-doall.py -h
+
+This will bring up the command line options. They work much like the unix programs
+head, grep, cut, etc. do.
+
+#4. cd to either usam or sam, which are both output as part of bwa-doall; 
+either usam or sam will work. Then, run bin-by-sam. It needs to know a couple of things
+from the user, which are supplied as command line arguments. You can figure out what
+it needs by invoking bin-by-sam.py and the -h option. For example, type
+
+<path-to-bin-by-sam.py>/bin-by-sam.py -h
+
+to see what the options are.
+
+Use a 1Mb bin size, keeping unique reads only, and insert breaks in the output file.
+
+When you've finished these steps, talk to Kirk about taking a boring table of numbers and
+making it into a beautiful plot.
